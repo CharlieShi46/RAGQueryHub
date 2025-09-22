@@ -40,3 +40,4 @@ if "chat_history" in st.session_state:
             st.write(ai_message.content)
             if i < len(st.session_state["chat_history"]) - 2:
                 st.divider()
+
