@@ -1,5 +1,5 @@
 from langchain.chains import ConversationalRetrievalChain
-from langchain_community.document_loaders import PyPDFLoader
+from langchain_community.document_loaders import PyMuPDFLoader
 from langchain_community.vectorstores import FAISS
 from langchain_openai import OpenAIEmbeddings
 from langchain_openai import ChatOpenAI
@@ -12,7 +12,7 @@ def qa_agent(openai_api_key, memory, uploaded_file, question):
     temp_file_path = "temp.pdf"
     with open(temp_file_path, "wb") as temp_file:
         temp_file.write(file_content)
-    loader = PyPDFLoader(temp_file_path)
+    loader = PyMuPDFLoader(temp_file_path)
     docs = loader.load()
     text_splitter = RecursiveCharacterTextSplitter(
         chunk_size=1000,
@@ -20,7 +20,7 @@ def qa_agent(openai_api_key, memory, uploaded_file, question):
         separators=["\n", "。", "！", "？", "，", "、", ""]
     )
     texts = text_splitter.split_documents(docs)
-    embeddings_model = OpenAIEmbeddings()
+    embeddings_model = OpenAIEmbeddings(openai_api_key=openai_api_key)
     db = FAISS.from_documents(texts, embeddings_model)
     retriever = db.as_retriever()
     qa = ConversationalRetrievalChain.from_llm(
